@@ -128,7 +128,8 @@ resource "azurerm_virtual_machine" "main" {
 			"mkdir myrepo", 
 			"cd myrepo", 
 			"git clone https://github.com/Ferdinand-Oluwaseye/jenkins-scripts", 
-			"cd jenkins-scripts", "./jenkinsInstall.sh"
+			"cd jenkins-scripts",
+		 	"./jenkinsInstall.sh"
 			]
 
 		connection {
