@@ -29,10 +29,11 @@ resource "azurerm_public_ip" "main" {
 	location = "${azurerm_resource_group.main.location}"	
 	resource_group_name = "${azurerm_resource_group.main.name}"
 	allocation_method = "Dynamic"
+	domain_name_label = "ferd-${formatdate("DDMMYYhhmmss", timestamp())}"
 
 }
 
-resource "azurerm_network_security_group" "main"{
+resource "azurerm_network_security_group" "main" {
 	name = "${var.prefix}-nsg"
 	location = "${azurerm_resource_group.main.location}"
 	resource_group_name = "${azurerm_resource_group.main.name}"
@@ -48,6 +49,18 @@ resource "azurerm_network_security_group" "main"{
 		source_address_prefix = "*"
 		destination_address_prefix = "*"
 	}
+
+	security_rule {
+                name = "Jenkins"
+                priority = "500"
+                direction = "Inbound"
+                access = "Allow"
+                protocol = "Tcp"
+                source_port_range = "*"
+                destination_port_range = "8080"
+                source_address_prefix = "*"
+                destination_address_prefix = "*"
+        }
 }
 
 
@@ -92,26 +105,30 @@ resource "azurerm_virtual_machine" "main" {
 
 	os_profile {
 		computer_name = "hostname"
-		admin_username = "testadmin"
+		admin_username = "Seye"
 		admin_password = "Password1234"
 	}
 
 	os_profile_linux_config {
-		disable_password_authentication = false
-
+		disable_password_authentication = true
+		ssh_keys {
+			path = "/home/Seye/.ssh/authorized_keys"
+			key_data = "${file("/home/ferdinand/.ssh/id_rsa.pub")}"		
+		}
 	}
 
 	tags = {
 		environment = "staging"
 	}
+
+	provisioner "remote-exec"{
+		inline = ["sudo apt update","sudo apt install -y jq", "mkdir myrepo", "cd myrepo", "git clone https://github.com/Ferdinand-Oluwaseye/jenkins-scripts", "cd jenkins-scripts", "./jenkinsInstall.sh"]
+		connection {
+			type = "ssh"
+			user = "Seye"
+			private_key = file("/home/ferdinand/.ssh/id_rsa")
+			host = "${azurerm_public_ip.main.fqdn}"
+		}
+	}	
 }
-
-
-
-
-
-
-
-
-
 
