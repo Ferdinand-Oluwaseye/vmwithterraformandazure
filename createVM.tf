@@ -122,7 +122,15 @@ resource "azurerm_virtual_machine" "main" {
 	}
 
 	provisioner "remote-exec"{
-		inline = ["sudo apt update","sudo apt install -y jq", "mkdir myrepo", "cd myrepo", "git clone https://github.com/Ferdinand-Oluwaseye/jenkins-scripts", "cd jenkins-scripts", "./jenkinsInstall.sh"]
+		inline = [
+			"sudo apt update",
+			"sudo apt install -y jq",
+			"mkdir myrepo", 
+			"cd myrepo", 
+			"git clone https://github.com/Ferdinand-Oluwaseye/jenkins-scripts", 
+			"cd jenkins-scripts", "./jenkinsInstall.sh"
+			]
+
 		connection {
 			type = "ssh"
 			user = "Seye"
